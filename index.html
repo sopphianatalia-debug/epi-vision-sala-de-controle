@@ -361,6 +361,11 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
         sb.from('ideas').select('id,texto,autor,frente,anexo_url,anexo_nome,arquivo_nome,arquivo_tipo,criado_em').order('criado_em', {ascending:false}),
         sb.from('activity').select('*').order('criado_em', {ascending:false}).limit(60)
       ]);
+      if(f.error) console.error('Erro ao carregar fronts:', f.error);
+      if(r.error) console.error('Erro ao carregar reqs:', r.error);
+      if(s.error) console.error('Erro ao carregar sections:', s.error);
+      if(i.error) console.error('Erro ao carregar ideas:', i.error);
+      if(a.error) console.error('Erro ao carregar activity:', a.error);
       state.fronts = (f.data||[]).map(mapFront);
       state.reqs = (r.data||[]).map(mapReq);
       state.sections = (s.data||[]).map(mapSection);
@@ -393,7 +398,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
   const mapActivity = row => ({ id: row.id, texto: row.texto, criadoEm: row.criado_em });
 
   async function pushActivity(text){
-    const { data } = await sb.from('activity').insert({ id: uid(), texto: text }).select().single();
+    const { data, error } = await sb.from('activity').insert({ id: uid(), texto: text }).select().single();
+    if(error){ console.error('Falha ao salvar atividade:', error); return; }
     if(data) state.activity.unshift(mapActivity(data));
     renderActivityFeed(); renderCalendar();
   }
