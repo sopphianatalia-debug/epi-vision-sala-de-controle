@@ -295,8 +295,8 @@
 
 <script>
 /* ====== CONFIGURAÇÃO — preencha com os dados do seu projeto Supabase ====== */
-const SUPABASE_URL = 'https://frlavqovzgorqmamoqpz.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
+const SUPABASE_URL = 'COLE_AQUI_A_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'COLE_AQUI_A_SUPABASE_ANON_KEY';
 /* =========================================================================== */
 
 (function(){
@@ -444,12 +444,20 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
       const card = document.createElement('div');
       card.className = 'front-card';
       card.style.borderLeftColor = STEEL_COLORS[idx % STEEL_COLORS.length];
+      card.style.position = 'relative';
       card.innerHTML = `
-        <input type="text" value="${escapeAttr(f.nome)}" data-role="nome" style="font-family:'Big Shoulders Display',sans-serif;font-size:19px;text-transform:uppercase;border:none;padding:0;margin-bottom:4px;width:100%;background:transparent;">
+        <button data-role="del-front" title="remover frente" style="position:absolute;top:10px;right:10px;background:none;border:none;color:var(--mist);cursor:pointer;font-size:14px;line-height:1;">🗑</button>
+        <input type="text" value="${escapeAttr(f.nome)}" data-role="nome" style="font-family:'Big Shoulders Display',sans-serif;font-size:19px;text-transform:uppercase;border:none;padding:0;margin-bottom:4px;width:88%;background:transparent;">
         <textarea data-role="foco" style="min-height:40px;border:none;padding:0;background:transparent;font-size:12.5px;color:var(--steel);width:100%;margin-bottom:10px;">${escapeHtml(f.foco)}</textarea>
         <div class="members" data-role="members"></div>
         <div class="add-member"><input type="text" placeholder="adicionar aluno(a)…" data-role="new-member"><button class="btn small ghost" data-role="add-member-btn">+</button></div>
       `;
+      card.querySelector('[data-role="del-front"]').addEventListener('click', async ()=>{
+        if(!confirm(`Remover a frente "${f.nome}"? Requisitos e seções que apontam pra ela não são apagados, só ficam sem frente associada.`)) return;
+        await sb.from('fronts').delete().eq('id', f.id);
+        state.fronts = state.fronts.filter(x=>x.id!==f.id);
+        renderFronts(); renderFrontSelects(); renderReqs(); renderSections(); renderIdeas();
+      });
       const membersWrap = card.querySelector('[data-role="members"]');
       f.membros.forEach((m, mi)=>{
         const tag = document.createElement('span'); tag.className='member-tag';
@@ -513,10 +521,19 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
         </div>
         <p class="req-desc">${escapeHtml(r.descricao||'')}</p>
         <div class="req-meta"><span style="color:${frontColor(r.frente)}">● ${frontName(r.frente)}</span><span>proposto por ${escapeHtml(r.autor||'anônimo')}</span></div>
-        <div class="req-actions"><button class="vote-btn" data-role="vote">👍 <span data-role="votos">${r.votos||0}</span></button></div>
+        <div class="req-actions">
+          <button class="vote-btn" data-role="vote">👍 <span data-role="votos">${r.votos||0}</span></button>
+          <button class="btn small ghost" data-role="del-req" style="margin-left:auto;">remover</button>
+        </div>
         <div class="comments" data-role="comments"></div>
         <div class="comment-form"><input type="text" placeholder="comentar…" data-role="comment-input"><button class="btn small ghost" data-role="comment-btn">Comentar</button></div>
       `;
+      card.querySelector('[data-role="del-req"]').addEventListener('click', async ()=>{
+        if(!confirm(`Remover o requisito "${r.titulo}"? Essa ação não tem volta.`)) return;
+        await sb.from('reqs').delete().eq('id', r.id);
+        state.reqs = state.reqs.filter(x=>x.id!==r.id);
+        renderReqs();
+      });
       card.querySelector('[data-role="status"]').value = r.status || 'proposta';
       card.querySelector('[data-role="status"]').addEventListener('change', async e=>{
         r.status = e.target.value;
@@ -750,13 +767,21 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
     grid.innerHTML = '';
     if(state.ideas.length===0){ grid.innerHTML = '<div class="empty-state">Mural vazio. Que tal a primeira ideia?</div>'; return; }
     state.ideas.forEach(i=>{
-      const note = document.createElement('div'); note.className='sticky';
+      const note = document.createElement('div'); note.className='sticky'; note.style.position='relative';
       note.style.borderTopColor = i.frente ? frontColor(i.frente) : '#8FA0A8';
       let attachHtml = '';
       if(i.anexoUrl) attachHtml += `<div class="attach"><a href="${escapeAttr(i.anexoUrl)}" target="_blank" rel="noopener">🔗 ${escapeHtml(i.anexoNome || 'link')}</a></div>`;
       if(i.temArquivo) attachHtml += `<div class="attach"><button data-role="baixar-anexo" data-id="${i.id}">📎 ${escapeHtml(i.arquivoNome||'arquivo')}</button></div>`;
-      note.innerHTML = `<div class="txt">${escapeHtml(i.texto)}</div>${attachHtml}<div class="foot"><span>${escapeHtml(i.autor||'anônimo')}</span><span>${i.frente ? frontName(i.frente) : 'geral'}</span></div>`;
+      note.innerHTML = `<button data-role="del-idea" data-id="${i.id}" title="remover" style="position:absolute;top:8px;right:8px;background:none;border:none;color:var(--mist);cursor:pointer;font-size:13px;">✕</button><div class="txt">${escapeHtml(i.texto)}</div>${attachHtml}<div class="foot"><span>${escapeHtml(i.autor||'anônimo')}</span><span>${i.frente ? frontName(i.frente) : 'geral'}</span></div>`;
       grid.appendChild(note);
+    });
+    grid.querySelectorAll('[data-role="del-idea"]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('Remover esta ideia do mural?')) return;
+        await sb.from('ideas').delete().eq('id', btn.dataset.id);
+        state.ideas = state.ideas.filter(x=>x.id!==btn.dataset.id);
+        renderIdeas();
+      });
     });
     grid.querySelectorAll('[data-role="baixar-anexo"]').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
