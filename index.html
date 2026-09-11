@@ -512,7 +512,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
       const input = card.querySelector('[data-role="new-member"]');
       const addMember = async ()=>{
         const v = input.value.trim(); if(!v) return;
-        f.membros.push(v); input.value='';
+        f.membros.push(v); input.value=''; input.blur();
         await sb.from('fronts').update({ membros: f.membros }).eq('id', f.id);
         renderFronts();
         pushActivity(`${v} entrou na ${f.nome}`);
@@ -616,7 +616,10 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
     const frente = document.getElementById('reqFrente').value;
     const autor = document.getElementById('reqAutor').value.trim();
     if(!titulo){ document.getElementById('reqTitulo').focus(); return; }
+    const btn = document.getElementById('addReqBtn');
+    btn.disabled = true; btn.textContent = 'salvando…';
     const { data, error } = await sb.from('reqs').insert({ id: uid(), titulo, descricao, tipo, frente, autor, status:'proposta', votos:0, comentarios:[] }).select().single();
+    btn.disabled = false; btn.textContent = 'Propor requisito';
     if(error){ console.error('Erro ao criar requisito:', error); alert('Não consegui criar o requisito — veja o console (F12) pra detalhes.'); return; }
     if(data) state.reqs.push(mapReq(data));
     document.getElementById('reqTitulo').value=''; document.getElementById('reqDescricao').value=''; document.getElementById('reqAutor').value='';
@@ -671,7 +674,10 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
     const nome = document.getElementById('secNome').value.trim();
     const frente = document.getElementById('secFrente').value;
     if(!nome){ document.getElementById('secNome').focus(); return; }
+    const btn = document.getElementById('addSecBtn');
+    btn.disabled = true; btn.textContent = 'salvando…';
     const { data, error } = await sb.from('sections').insert({ id: uid(), nome, frente, status:'nao-iniciado', conteudo:'' }).select().single();
+    btn.disabled = false; btn.textContent = 'Adicionar seção';
     if(error){ console.error('Erro ao criar seção:', error); alert('Não consegui criar a seção — veja o console (F12) pra detalhes.'); return; }
     if(data) state.sections.push(mapSection(data));
     document.getElementById('secNome').value='';
