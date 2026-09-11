@@ -524,7 +524,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
   }
   document.getElementById('addFrontBtn').addEventListener('click', async ()=>{
     const n = state.fronts.length + 1;
-    const { data } = await sb.from('fronts').insert({ id: uid(), nome: `Frente ${n}`, foco:'defina o foco desta frente', membros: [] }).select().single();
+    const { data, error } = await sb.from('fronts').insert({ id: uid(), nome: `Frente ${n}`, foco:'defina o foco desta frente', membros: [] }).select().single();
+    if(error){ console.error('Erro ao criar frente:', error); alert('Não consegui criar a frente — veja o console (F12) pra detalhes.'); return; }
     if(data){ state.fronts.push(mapFront(data)); renderFronts(); renderFrontSelects(); }
   });
 
@@ -615,7 +616,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
     const frente = document.getElementById('reqFrente').value;
     const autor = document.getElementById('reqAutor').value.trim();
     if(!titulo){ document.getElementById('reqTitulo').focus(); return; }
-    const { data } = await sb.from('reqs').insert({ id: uid(), titulo, descricao, tipo, frente, autor, status:'proposta', votos:0, comentarios:[] }).select().single();
+    const { data, error } = await sb.from('reqs').insert({ id: uid(), titulo, descricao, tipo, frente, autor, status:'proposta', votos:0, comentarios:[] }).select().single();
+    if(error){ console.error('Erro ao criar requisito:', error); alert('Não consegui criar o requisito — veja o console (F12) pra detalhes.'); return; }
     if(data) state.reqs.push(mapReq(data));
     document.getElementById('reqTitulo').value=''; document.getElementById('reqDescricao').value=''; document.getElementById('reqAutor').value='';
     renderReqs();
@@ -669,7 +671,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
     const nome = document.getElementById('secNome').value.trim();
     const frente = document.getElementById('secFrente').value;
     if(!nome){ document.getElementById('secNome').focus(); return; }
-    const { data } = await sb.from('sections').insert({ id: uid(), nome, frente, status:'nao-iniciado', conteudo:'' }).select().single();
+    const { data, error } = await sb.from('sections').insert({ id: uid(), nome, frente, status:'nao-iniciado', conteudo:'' }).select().single();
+    if(error){ console.error('Erro ao criar seção:', error); alert('Não consegui criar a seção — veja o console (F12) pra detalhes.'); return; }
     if(data) state.sections.push(mapSection(data));
     document.getElementById('secNome').value='';
     renderSections();
@@ -852,7 +855,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
     try{
       let arquivo_dados=null, arquivo_nome=null, arquivo_tipo=null;
       if(file){ arquivo_dados = await fileToDataUrl(file); arquivo_nome = file.name; arquivo_tipo = file.type; }
-      const { data } = await sb.from('ideas').insert({ id: uid(), texto, autor, frente, anexo_url: anexoUrl||null, anexo_nome: anexoNome||null, arquivo_dados, arquivo_nome, arquivo_tipo }).select('id,texto,autor,frente,anexo_url,anexo_nome,arquivo_nome,arquivo_tipo,criado_em').single();
+      const { data, error } = await sb.from('ideas').insert({ id: uid(), texto, autor, frente, anexo_url: anexoUrl||null, anexo_nome: anexoNome||null, arquivo_dados, arquivo_nome, arquivo_tipo }).select('id,texto,autor,frente,anexo_url,anexo_nome,arquivo_nome,arquivo_tipo,criado_em').single();
+      if(error){ console.error('Erro ao fixar ideia:', error); throw error; }
       if(data) state.ideas.unshift(mapIdea(data));
       pushActivity(`${autor||'alguém'} fixou uma ideia no mural${arquivo_nome ? ' (com arquivo anexado)' : (anexoUrl ? ' (com link)' : '')}`);
     }catch(e){ console.error(e); alert('Não consegui salvar — tente de novo.'); }
