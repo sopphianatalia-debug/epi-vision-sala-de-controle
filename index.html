@@ -92,7 +92,14 @@
   .sticky .attach a, .sticky .attach button{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--steel); text-decoration:none; border:1px solid var(--steel); padding:3px 8px; display:inline-flex; gap:5px; align-items:center; background:none; cursor:pointer; }
   .sticky .foot{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--mist); margin-top:10px; display:flex; justify-content:space-between;}
   .modal-form{ margin-bottom:20px; }
-  .row{ display:flex; gap:12px; }
+  .row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .row > *{ min-width:160px; }
+  @media (max-width:480px){
+    .console{ padding:18px 14px 60px; }
+    .console-head{ flex-direction:column; align-items:flex-start; }
+    .head-right{ width:100%; justify-content:space-between; }
+    .doc-sheet{ padding:20px; }
+  }
   .row > *{ flex:1; }
   .hint{ font-size:12px; color:var(--mist); margin-top:-8px; margin-bottom:16px;}
   .doc-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
@@ -250,7 +257,6 @@
         <div class="doc-namefield"><label>Seu nome</label><input type="text" id="editorName" style="width:160px;"></div>
       </div>
     </div>
-    <p class="hint">Edições salvam ~1,5s depois de parar de digitar. Editar a mesma seção ao mesmo tempo que outra pessoa pode sobrescrever — combinem quem mexe em qual.</p>
 
     <div class="surface" style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:22px; border-left:5px solid var(--signal);">
       <div>
@@ -459,9 +465,11 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
       card.style.borderLeftColor = STEEL_COLORS[idx % STEEL_COLORS.length];
       card.style.position = 'relative';
       card.innerHTML = `
-        <button data-role="del-front" title="remover frente" style="position:absolute;top:10px;right:10px;background:none;border:none;color:var(--mist);cursor:pointer;font-size:14px;line-height:1;">🗑</button>
-        <input type="text" value="${escapeAttr(f.nome)}" data-role="nome" style="font-family:'Big Shoulders Display',sans-serif;font-size:19px;text-transform:uppercase;border:none;padding:0;margin-bottom:4px;width:88%;background:transparent;">
-        <textarea data-role="foco" style="min-height:40px;border:none;padding:0;background:transparent;font-size:12.5px;color:var(--steel);width:100%;margin-bottom:10px;">${escapeHtml(f.foco)}</textarea>
+        <button data-role="del-front" title="remover frente" style="position:absolute;top:8px;right:8px;background:none;border:none;color:var(--mist);cursor:pointer;font-size:16px;line-height:1;padding:6px;">🗑</button>
+        <label style="margin-bottom:3px;">Nome da frente</label>
+        <input type="text" value="${escapeAttr(f.nome)}" data-role="nome" style="font-family:'Big Shoulders Display',sans-serif;font-size:18px;text-transform:uppercase;margin-bottom:10px;">
+        <label style="margin-bottom:3px;">Foco</label>
+        <textarea data-role="foco" style="min-height:52px;font-size:13px;color:var(--ink);margin-bottom:10px;">${escapeHtml(f.foco)}</textarea>
         <div class="members" data-role="members"></div>
         <div class="add-member"><input type="text" placeholder="adicionar aluno(a)…" data-role="new-member"><button class="btn small ghost" data-role="add-member-btn">+</button></div>
       `;
