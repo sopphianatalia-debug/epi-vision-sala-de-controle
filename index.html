@@ -172,7 +172,6 @@
   <div class="console-head">
     <div>
       <h1>EPI Vision<br>Sala de Controle</h1>
-      <p>Espaço de trabalho compartilhado da turma — cada dupla registra o que decide aqui, todo mundo vê.</p>
     </div>
     <div class="head-right">
       <div class="status-chip" id="syncStatus"><span class="status-dot load"></span> sincronizando…</div>
@@ -249,7 +248,6 @@
       <div><h2 class="section-title" style="margin-bottom:0;">Documento — edição coletiva</h2></div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <div class="doc-namefield"><label>Seu nome</label><input type="text" id="editorName" style="width:160px;"></div>
-        <button class="btn ghost small" id="printBtn">Imprimir / salvar PDF</button>
       </div>
     </div>
     <p class="hint">Edições salvam ~1,5s depois de parar de digitar. Editar a mesma seção ao mesmo tempo que outra pessoa pode sobrescrever — combinem quem mexe em qual.</p>
@@ -730,7 +728,6 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
     if(flag){ flag.style.opacity = 1; setTimeout(()=>{ flag.style.opacity = 0; }, 1400); }
     pushActivity(`${s.conteudoEditadoPor} editou o texto da seção "${s.nome}"`);
   }
-  document.getElementById('printBtn').addEventListener('click', ()=>window.print());
 
   /* ---------- CALENDARIO ---------- */
   function dateKey(ts){ const d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
