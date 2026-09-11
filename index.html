@@ -452,7 +452,15 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
   function frontName(id){ const f = state.fronts.find(x=>x.id===id); return f ? f.nome : '—'; }
   function frontColor(id){ const idx = state.fronts.findIndex(x=>x.id===id); return STEEL_COLORS[(idx<0?0:idx) % STEEL_COLORS.length]; }
 
+  function frontsGridIsBeingEdited(){
+    const el = document.activeElement;
+    if(!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return false;
+    const grid = document.getElementById('frontsGrid');
+    return !!(grid && grid.contains(el));
+  }
+
   function renderFronts(){
+    if(frontsGridIsBeingEdited()) return; // don't yank the card out from under someone mid-edit
     const grid = document.getElementById('frontsGrid');
     grid.innerHTML = '';
     if(state.fronts.length===0){
