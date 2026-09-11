@@ -321,6 +321,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
   let calSelected = null;
   let activeEditSectionId = null;
   const saveTimers = {};
+  let lastCommentAuthor = '';
 
   /* ---------- AUTH ---------- */
   document.getElementById('loginBtn').addEventListener('click', doLogin);
@@ -528,7 +529,15 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
   });
 
   /* ---------- BACKLOG ---------- */
+  function reqListIsBeingEdited(){
+    const el = document.activeElement;
+    if(!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return false;
+    const list = document.getElementById('reqList');
+    return !!(list && list.contains(el));
+  }
+
   function renderReqs(){
+    if(reqListIsBeingEdited()) return;
     const list = document.getElementById('reqList');
     const filterTipo = document.getElementById('filterTipo').value;
     const filterStatus = document.getElementById('filterStatus').value;
@@ -555,7 +564,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
           <button class="btn small ghost" data-role="del-req" style="margin-left:auto;">remover</button>
         </div>
         <div class="comments" data-role="comments"></div>
-        <div class="comment-form"><input type="text" placeholder="comentar…" data-role="comment-input"><button class="btn small ghost" data-role="comment-btn">Comentar</button></div>
+        <div class="comment-form"><input type="text" placeholder="seu nome" data-role="comment-autor" style="max-width:120px;"><input type="text" placeholder="comentar…" data-role="comment-input"><button class="btn small ghost" data-role="comment-btn">Comentar</button></div>
       `;
       card.querySelector('[data-role="del-req"]').addEventListener('click', async ()=>{
         if(!confirm(`Remover o requisito "${r.titulo}"? Essa ação não tem volta.`)) return;
@@ -582,15 +591,20 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
         commentsWrap.appendChild(cd);
       });
       const cInput = card.querySelector('[data-role="comment-input"]');
+      const cAutorInput = card.querySelector('[data-role="comment-autor"]');
+      cAutorInput.value = lastCommentAuthor;
       const addComment = async ()=>{
         const v = cInput.value.trim(); if(!v) return;
+        const autorNome = cAutorInput.value.trim() || 'anônimo';
+        lastCommentAuthor = cAutorInput.value.trim();
         if(!r.comentarios) r.comentarios = [];
-        r.comentarios.push({ autor: document.getElementById('reqAutor').value.trim() || 'anônimo', texto: v });
+        r.comentarios.push({ autor: autorNome, texto: v });
         await sb.from('reqs').update({ comentarios: r.comentarios }).eq('id', r.id);
-        cInput.value=''; renderReqs();
+        cInput.value=''; cInput.blur(); cAutorInput.blur(); renderReqs();
       };
       card.querySelector('[data-role="comment-btn"]').addEventListener('click', addComment);
       cInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addComment(); }});
+      cAutorInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); cInput.focus(); }});
       list.appendChild(card);
     });
   }
