@@ -371,7 +371,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_8_bCaZPpgWj7VMaGPVJ0Wg_CMs-Pi6_';
       const [f,r,s,i,a] = await Promise.all([
         sb.from('fronts').select('*').order('criado_em'),
         sb.from('reqs').select('*').order('criado_em'),
-        sb.from('sections').select('*').order('criado_em', {foreignTable:undefined}).order('atualizado_em', {ascending:true}),
+        sb.from('sections').select('*').order('atualizado_em', {ascending:true}),
         sb.from('ideas').select('id,texto,autor,frente,anexo_url,anexo_nome,arquivo_nome,arquivo_tipo,criado_em').order('criado_em', {ascending:false}),
         sb.from('activity').select('*').order('criado_em', {ascending:false}).limit(60)
       ]);
